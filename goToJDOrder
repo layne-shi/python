@@ -1,0 +1,95 @@
+# -*- coding: utf-8 -*-
+
+import wx
+import wx.xrc
+import wx._adv, wx._html # 这行只是为了解决打包后运行时报错的问题
+from selenium import webdriver
+import time
+
+
+wx.ID_username = 1000
+wx.ID_password = 1001
+wx.ID_loginBtn = 1002
+
+###########################################################################
+## Class JDOrder
+###########################################################################
+
+class JDOrder ( wx.Frame ):
+
+    def __init__( self, parent ):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 194,199 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"username", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1.Wrap( -1 )
+
+        bSizer1.Add( self.m_staticText1, 0, wx.ALL, 5 )
+
+        self.username = wx.TextCtrl( self, wx.ID_username, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer1.Add( self.username, 1, wx.ALL|wx.EXPAND, 5 )
+
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"password", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2.Wrap( -1 )
+
+        bSizer1.Add( self.m_staticText2, 0, wx.ALL, 5 )
+
+        self.password = wx.TextCtrl( self, wx.ID_password, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer1.Add( self.password, 1, wx.ALL|wx.EXPAND, 5 )
+
+        self.loginBtn = wx.Button( self, wx.ID_loginBtn, u"login", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer1.Add( self.loginBtn, 1, wx.ALL|wx.EXPAND, 5 )
+
+
+        self.SetSizer( bSizer1 )
+        self.Layout()
+
+        self.Centre( wx.BOTH )
+
+        # Connect Events
+        self.loginBtn.Bind( wx.EVT_BUTTON, self.loginFunc )
+
+    def __del__( self ):
+        pass
+
+
+        # Virtual event handlers, overide them in your derived class
+    def loginFunc( self, event ):  
+        browser = webdriver.Chrome()
+        browser.get("https://passport.jd.com/new/login.aspx?ReturnUrl=https%3A%2F%2Fwww.jd.com%2F")
+
+        # time.sleep(10)
+
+        # self.loginTabR = driver.find_element_by_css_selector("div.login-tab-r")
+
+        self.inputTypeJs_="document.getElementsByClassName('login-tab-r')[0].click();"  
+        browser.execute_script(self.inputTypeJs_)
+
+        # time.sleep(5)
+        browser.find_element_by_css_selector("input#loginname").send_keys(self.username.GetValue())
+        browser.find_element_by_css_selector("input#nloginpwd").send_keys(self.password.GetValue())
+
+        self.btnClickJs_="document.getElementById('loginsubmit').click();"  
+        browser.execute_script(self.btnClickJs_)
+
+        self.isLogon(browser)
+    
+    # 是否登录成功
+    def isLogon(self, browser):
+        try:
+            browser.find_element_by_css_selector("a.nickname")
+            self.orderLinkClick="document.querySelector('a[href=\"//order.jd.com/center/list.action\"]').click();"  
+            browser.execute_script(self.orderLinkClick)
+            print('done')
+        except:
+            self.isLogon(browser)
+
+
+if __name__ == '__main__':
+    app = wx.App()
+    frame = JDOrder(None)
+    frame.Show()
+    app.MainLoop()
