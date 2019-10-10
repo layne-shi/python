@@ -8,3 +8,11 @@ python学习和练习
 获取指定文件夹下所有文件名
 # goToJDOrder
 运行，输入用户名、密码后会自动点击登录，这时手动完成拼图校验。然后会自动登录到首页并跳转到订单页面
+# mouseDragSlideVerification
+鼠标拖动验证条
+#getHaozuUrlsAndSwitchTabCloseTab
+获取好租地区一二级的地址
+点击列表打开详情
+切换到详情页签，获取belong-build
+关闭详情页签
+切换回列表页
